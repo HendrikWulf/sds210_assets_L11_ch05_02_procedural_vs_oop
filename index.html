@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Procedural vs OOP Explorer</title>
+<style>
+    :root {
+        --bg: #f8fafc;
+        --card: #ffffff;
+        --border: #cbd5e1;
+        --text: #0f172a;
+        --muted: #64748b;
+        --accent: #2563eb;
+        --accent-soft: #dbeafe;
+        --warn: #f59e0b;
+        --warn-soft: #fef3c7;
+        --ok: #16a34a;
+        --ok-soft: #dcfce7;
+    }
+
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+    }
+
+    .app {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 24px;
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        color: var(--muted);
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .controls {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        margin-bottom: 18px;
+        box-shadow: 0 3px 8px rgba(15, 23, 42, 0.06);
+    }
+
+    .controls h2 {
+        margin-top: 0;
+        font-size: 1.1rem;
+    }
+
+    .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .chip {
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 8px 12px;
+        background: #fff;
+        cursor: pointer;
+        user-select: none;
+        transition: 0.2s;
+        font-size: 0.95rem;
+    }
+
+    .chip.active {
+        border-color: var(--accent);
+        background: var(--accent-soft);
+        color: #1d4ed8;
+        font-weight: 650;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+    }
+
+    @media (max-width: 850px) {
+        .grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .panel {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        box-shadow: 0 3px 8px rgba(15, 23, 42, 0.06);
+        min-height: 470px;
+    }
+
+    .panel h2 {
+        margin-top: 0;
+        font-size: 1.25rem;
+    }
+
+    .tagline {
+        color: var(--muted);
+        margin-top: -6px;
+        margin-bottom: 16px;
+    }
+
+    .workspace {
+        display: grid;
+        gap: 12px;
+    }
+
+    .box {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px;
+        background: #f8fafc;
+    }
+
+    .box h3 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+    }
+
+    .field {
+        display: inline-block;
+        background: #e2e8f0;
+        margin: 4px 4px 4px 0;
+        padding: 5px 8px;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88rem;
+    }
+
+    .function {
+        display: inline-block;
+        background: var(--warn-soft);
+        border: 1px solid #fbbf24;
+        margin: 4px 4px 4px 0;
+        padding: 5px 8px;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88rem;
+    }
+
+    .method {
+        display: inline-block;
+        background: var(--ok-soft);
+        border: 1px solid #86efac;
+        margin: 4px 4px 4px 0;
+        padding: 5px 8px;
+        border-radius: 8px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.88rem;
+    }
+
+    .arrow {
+        text-align: center;
+        color: var(--muted);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+    }
+
+    .complexity {
+        margin-top: 14px;
+        padding: 12px;
+        border-radius: 12px;
+        background: #f1f5f9;
+        border: 1px dashed var(--border);
+    }
+
+    .meter {
+        height: 12px;
+        background: #e2e8f0;
+        border-radius: 999px;
+        overflow: hidden;
+        margin-top: 8px;
+    }
+
+    .meter-fill {
+        height: 100%;
+        width: 0%;
+        background: var(--accent);
+        transition: width 0.25s ease;
+    }
+
+    .recommendation {
+        margin-top: 18px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        border-radius: 16px;
+        padding: 16px;
+        line-height: 1.5;
+    }
+
+    .recommendation strong {
+        color: #1d4ed8;
+    }
+
+    .mini-code {
+        background: #0f172a;
+        color: #e2e8f0;
+        border-radius: 12px;
+        padding: 12px;
+        overflow-x: auto;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 0.85rem;
+        line-height: 1.45;
+    }
+</style>
+</head>
+<body>
+<div class="app">
+    <h1>Procedural vs Object-Oriented Design</h1>
+    <p class="subtitle">
+        Add complexity to the same spatial point problem. Watch how the procedural version
+        must pass loose data through external functions, while the OOP version keeps related
+        data and behavior together inside one object.
+    </p>
+
+    <section class="controls">
+        <h2>1. Add fields to the spatial point</h2>
+        <p class="subtitle">
+            Start with just x, y, and name. Then click fields that real spatial projects often need.
+        </p>
+        <div class="chips">
+            <span class="chip active" data-field="x">x</span>
+            <span class="chip active" data-field="y">y</span>
+            <span class="chip active" data-field="name">name</span>
+            <span class="chip" data-field="crs">crs</span>
+            <span class="chip" data-field="elevation_m">elevation_m</span>
+            <span class="chip" data-field="timestamp">timestamp</span>
+            <span class="chip" data-field="sensor_history">sensor_history</span>
+        </div>
+    </section>
+
+    <section class="grid">
+        <article class="panel">
+            <h2>Procedural model</h2>
+            <p class="tagline">Data and behavior are separated.</p>
+
+            <div class="workspace">
+                <div class="box">
+                    <h3>Passive data dictionary</h3>
+                    <div id="procedural-fields"></div>
+                </div>
+
+                <div class="arrow">data is passed into ↓</div>
+
+                <div class="box">
+                    <h3>Standalone functions</h3>
+                    <span class="function">distance(point1, point2)</span>
+                    <span class="function">move_point(point, dx, dy)</span>
+                    <span class="function">point_in_bbox(point, bbox)</span>
+                    <div id="extra-procedural-functions"></div>
+                </div>
+
+                <div class="complexity">
+                    <strong>Maintenance pressure</strong>
+                    <div class="meter"><div id="procedural-meter" class="meter-fill"></div></div>
+                    <p id="procedural-note"></p>
+                </div>
+
+                <pre class="mini-code" id="procedural-code"></pre>
+            </div>
+        </article>
+
+        <article class="panel">
+            <h2>Object-oriented model</h2>
+            <p class="tagline">Data and behavior are bundled together.</p>
+
+            <div class="workspace">
+                <div class="box">
+                    <h3>Point object</h3>
+                    <div id="oop-fields"></div>
+                </div>
+
+                <div class="arrow">object exposes ↓</div>
+
+                <div class="box">
+                    <h3>Methods on the object</h3>
+                    <span class="method">.distance_to(other)</span>
+                    <span class="method">.move(dx, dy)</span>
+                    <span class="method">.inside(bbox)</span>
+                    <div id="extra-oop-methods"></div>
+                </div>
+
+                <div class="complexity">
+                    <strong>Maintenance pressure</strong>
+                    <div class="meter"><div id="oop-meter" class="meter-fill"></div></div>
+                    <p id="oop-note"></p>
+                </div>
+
+                <pre class="mini-code" id="oop-code"></pre>
+            </div>
+        </article>
+    </section>
+
+    <section class="recommendation">
+        <strong id="recommendation-title">Recommendation:</strong>
+        <span id="recommendation-text"></span>
+    </section>
+</div>
+
+<script>
+    const chips = document.querySelectorAll(".chip");
+    const baseFields = ["x", "y", "name"];
+
+    function selectedFields() {
+        return Array.from(chips)
+            .filter(chip => chip.classList.contains("active"))
+            .map(chip => chip.dataset.field);
+    }
+
+    function render() {
+        const fields = selectedFields();
+        const extraCount = fields.length - baseFields.length;
+
+        document.getElementById("procedural-fields").innerHTML = fields
+            .map(field => `<span class="field">"${field}": ...</span>`)
+            .join("");
+
+        document.getElementById("oop-fields").innerHTML = fields
+            .map(field => `<span class="field">self.${field}</span>`)
+            .join("");
+
+        const extraFunctions = [];
+        const extraMethods = [];
+
+        if (fields.includes("crs")) {
+            extraFunctions.push("validate_crs(point)");
+            extraMethods.push(".validate_crs()");
+        }
+        if (fields.includes("elevation_m")) {
+            extraFunctions.push("elevation_difference(p1, p2)");
+            extraMethods.push(".elevation_difference(other)");
+        }
+        if (fields.includes("timestamp")) {
+            extraFunctions.push("is_recent(point)");
+            extraMethods.push(".is_recent()");
+        }
+        if (fields.includes("sensor_history")) {
+            extraFunctions.push("update_sensor_history(point, value)");
+            extraMethods.push(".update_sensor(value)");
+        }
+
+        document.getElementById("extra-procedural-functions").innerHTML = extraFunctions
+            .map(fn => `<span class="function">${fn}</span>`)
+            .join("");
+
+        document.getElementById("extra-oop-methods").innerHTML = extraMethods
+            .map(fn => `<span class="method">${fn}</span>`)
+            .join("");
+
+        const proceduralPressure = Math.min(100, 25 + extraCount * 18);
+        const oopPressure = Math.min(100, 20 + extraCount * 7);
+
+        document.getElementById("procedural-meter").style.width = `${proceduralPressure}%`;
+        document.getElementById("oop-meter").style.width = `${oopPressure}%`;
+
+        document.getElementById("procedural-note").textContent =
+            extraCount <= 1
+                ? "Still manageable: a dictionary plus a few functions is clear."
+                : "More fields mean more manual copying, more key names, and more chances for inconsistent data.";
+
+        document.getElementById("oop-note").textContent =
+            extraCount <= 1
+                ? "The class setup costs a few extra lines, but the structure is explicit."
+                : "The object absorbs new attributes and keeps related behavior close to the data.";
+
+        const dictLines = fields.map(f => `    "${f}": ...`).join(",\n");
+        document.getElementById("procedural-code").textContent =
+`point = {
+${dictLines}
+}
+
+distance(point_a, point_b)
+move_point(point, dx, dy)`;
+
+        const initLines = fields.map(f => `        self.${f} = ${f}`).join("\n");
+        document.getElementById("oop-code").textContent =
+`class Point:
+    def __init__(${fields.join(", ")}):
+${initLines}
+
+point.distance_to(other)
+point.move(dx, dy)`;
+
+        const recommendation = document.getElementById("recommendation-text");
+        if (extraCount <= 1) {
+            recommendation.textContent =
+                "A procedural function is probably enough. The task is small, and the data structure is simple.";
+        } else if (extraCount <= 3) {
+            recommendation.textContent =
+                "Both designs can work. Use functions for a short analysis, but consider a class if the point appears repeatedly across the project.";
+        } else {
+            recommendation.textContent =
+                "A class is likely worth it. The entity now has multiple related attributes and behavior that should stay consistent over time.";
+        }
+    }
+
+    chips.forEach(chip => {
+        chip.addEventListener("click", () => {
+            if (baseFields.includes(chip.dataset.field)) return;
+            chip.classList.toggle("active");
+            render();
+        });
+    });
+
+    render();
+</script>
+</body>
+</html>
